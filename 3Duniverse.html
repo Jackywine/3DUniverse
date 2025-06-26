@@ -282,7 +282,9 @@
                   const isClosed = isHandClosed(landmarks);
 
                   // 更新手势状态
-                  if (handedness === 'Left') {
+                  const isHandOnRightOfScreen = landmarks[0].x > 0.5; // Corresponds to user's left hand in mirrored view
+
+                  if (isHandOnRightOfScreen) { // This is the user's left hand
                       leftHandPrevClosed = leftHandClosed;
                       leftHandClosed = isClosed;
 
@@ -307,7 +309,7 @@
                           // 手展开时移除吸引
                           leftHandAttractor = null;
                       }
-                  } else {
+                  } else { // This is the user's right hand
                       rightHandPrevClosed = rightHandClosed;
                       rightHandClosed = isClosed;
                   }
