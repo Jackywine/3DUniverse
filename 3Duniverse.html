@@ -297,13 +297,11 @@
 
                       // 左手握拳时，如果超新星已激活，则作为吸引子
                       if (leftHandClosed && supernovaActive) {
-                          const centerX = landmarks.reduce((sum, lm) => sum + lm.x, 0) / landmarks.length;
-                          const centerY = landmarks.reduce((sum, lm) => sum + lm.y, 0) / landmarks.length;
-                          const centerZ = landmarks.reduce((sum, lm) => sum + lm.z, 0) / landmarks.length;
+                          const wrist = landmarks[0]; // 手腕关节
                           leftHandAttractor = new THREE.Vector3(
-                              (1 - centerX) * 100 - 50,
-                              centerY * -100 + 50,
-                              centerZ * 50
+                              (1 - wrist.x) * 100 - 50,
+                              wrist.y * -100 + 50,
+                              wrist.z * 50
                           );
                       } else if (!leftHandClosed) {
                           // 手展开时移除吸引
