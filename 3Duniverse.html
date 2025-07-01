@@ -1,95 +1,114 @@
+<!-- 定义文档类型为HTML5 -->
 <!DOCTYPE html>
+<!-- 设置页面语言为中文 -->
 <html lang="zh-CN">
+<!-- 文档头部，包含元数据和样式表 -->
 <head>
+  <!-- 设置字符编码为UTF-8 -->
   <meta charset="UTF-8">
+  <!-- 设置视口，以确保在不同设备上正确显示 -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- 页面标题 -->
   <title>交互式3D粒子星系 - 带随机连线</title>
+  <!-- 内联CSS样式 -->
   <style>
+      /* CSS重置，确保所有元素在所有浏览器中表现一致 */
       * {
-          margin: 0;
-          padding: 0;
-          box-sizing: border-box;
+          margin: 0; /* 移除外边距 */
+          padding: 0; /* 移除内边距 */
+          box-sizing: border-box; /* 盒模型计算方式设置为border-box */
       }
       
+      /* 页面主体样式 */
       body {
-          background-color: transparent;
-          color: #44ffbb;
-          font-family: 'Arial', sans-serif;
-          overflow: hidden;
-          cursor: crosshair;
+          background-color: transparent; /* 背景色设置为透明 */
+          color: #44ffbb; /* 文本颜色 */
+          font-family: 'Arial', sans-serif; /* 字体 */
+          overflow: hidden; /* 隐藏溢出内容 */
+          cursor: crosshair; /* 鼠标指针样式 */
       }
       
+      /* Three.js渲染画布样式 */
       #canvas {
-          position: fixed;
+          position: fixed; /* 固定定位 */
           top: 0;
           left: 0;
           width: 100%;
           height: 100%;
-          z-index: 1;
+          z-index: 1; /* 设置堆叠顺序 */
       }
       
+      /* 控制面板容器样式 */
       .controls {
-          position: fixed;
+          position: fixed; /* 固定定位 */
           top: 20px;
           right: 20px;
-          background: rgba(0, 0, 0, 0.8);
-          border: 1px solid #44ffbb;
-          border-radius: 10px;
-          padding: 20px;
-          backdrop-filter: blur(10px);
-          z-index: 1000;
-          min-width: 250px;
+          background: rgba(0, 0, 0, 0.8); /* 半透明背景 */
+          border: 1px solid #44ffbb; /* 边框 */
+          border-radius: 10px; /* 圆角 */
+          padding: 20px; /* 内边距 */
+          backdrop-filter: blur(10px); /* 背景模糊效果 */
+          z-index: 1000; /* 确保在顶层 */
+          min-width: 250px; /* 最小宽度 */
       }
       
+      /* 控制面板标题样式 */
       .controls h3 {
           margin-bottom: 15px;
           text-align: center;
-          text-shadow: 0 0 10px #44ffbb;
+          text-shadow: 0 0 10px #44ffbb; /* 文本发光效果 */
       }
       
+      /* 控制项容器样式 */
       .control-item {
           margin-bottom: 15px;
       }
       
+      /* 控制项标签样式 */
       .control-item label {
           display: block;
           margin-bottom: 5px;
           font-size: 14px;
       }
       
+      /* 范围输入滑块样式 */
       .control-item input[type="range"] {
           width: 100%;
-          -webkit-appearance: none;
+          -webkit-appearance: none; /* 移除默认样式 */
           height: 5px;
           background: #333;
           outline: none;
           border-radius: 5px;
       }
       
+      /* Webkit浏览器滑块按钮样式 */
       .control-item input[type="range"]::-webkit-slider-thumb {
-          -webkit-appearance: none;
+          -webkit-appearance: none; /* 移除默认样式 */
           width: 15px;
           height: 15px;
           background: #44ffbb;
           border-radius: 50%;
           cursor: pointer;
-          box-shadow: 0 0 10px #44ffbb;
+          box-shadow: 0 0 10px #44ffbb; /* 按钮发光效果 */
       }
       
+      /* Firefox浏览器滑块按钮样式 */
       .control-item input[type="range"]::-moz-range-thumb {
           width: 15px;
           height: 15px;
           background: #44ffbb;
           border-radius: 50%;
           cursor: pointer;
-          box-shadow: 0 0 10px #44ffbb;
+          box-shadow: 0 0 10px #44ffbb; /* 按钮发光效果 */
       }
       
+      /* 显示滑块值的span元素样式 */
       .value {
           color: #88ffdd;
           font-size: 12px;
       }
       
+      /* 信息提示框样式 */
       .info {
           position: fixed;
           bottom: 20px;
@@ -102,17 +121,20 @@
           max-width: 300px;
       }
       
+      /* 信息框标题样式 */
       .info h4 {
           margin-bottom: 10px;
           text-shadow: 0 0 10px #44ffbb;
       }
       
+      /* 信息框段落样式 */
       .info p {
           font-size: 14px;
           line-height: 1.5;
           opacity: 0.8;
       }
       
+      /* 按钮通用样式 */
       button {
           background: transparent;
           border: 1px solid #44ffbb;
@@ -120,17 +142,19 @@
           padding: 8px 16px;
           border-radius: 5px;
           cursor: pointer;
-          transition: all 0.3s;
+          transition: all 0.3s; /* 平滑过渡效果 */
           width: 100%;
           margin-top: 10px;
       }
       
+      /* 按钮悬停效果 */
       button:hover {
           background: #44ffbb;
           color: #000;
           box-shadow: 0 0 20px #44ffbb;
       }
 
+      /* 进度条容器样式 */
       .progress-bar-container {
           width: 100%;
           height: 10px;
@@ -139,173 +163,220 @@
           margin-top: 5px;
       }
 
+      /* 进度条本身样式 */
       .progress-bar {
-          width: 100%;
+          width: 100%; /* 初始宽度 */
           height: 100%;
           background: #44ffbb;
           border-radius: 5px;
-          transition: width 0.1s linear;
+          transition: width 0.1s linear; /* 宽度变化时的平滑过渡 */
       }
       
+      /* 复选框项目容器样式 */
       .checkbox-item {
           display: flex;
           align-items: center;
           margin-bottom: 10px;
       }
       
+      /* 复选框输入控件样式 */
       .checkbox-item input[type="checkbox"] {
           margin-right: 10px;
-          transform: scale(1.2);
+          transform: scale(1.2); /* 放大复选框 */
       }
 
+      /* 视频容器样式，用于摄像头背景 */
       #video-container {
           position: fixed;
           top: 0;
           left: 0;
           width: 100%;
           height: 100%;
-          z-index: -1;
+          z-index: -1; /* 置于最底层 */
           background-color: #000;
       }
 
+      /* 视频元素样式 */
       #video {
           width: 100%;
           height: 100%;
-          object-fit: cover;
-          transform: scaleX(-1);
+          object-fit: cover; /* 覆盖整个容器 */
+          transform: scaleX(-1); /* 水平翻转，实现镜像效果 */
       }
   </style>
 </head>
+<!-- 页面主体内容 -->
 <body>
+  <!-- 视频背景容器 -->
   <div id="video-container">
+      <!-- 视频元素，用于显示摄像头画面 -->
       <video id="video" autoplay playsinline></video>
   </div>
+  <!-- Three.js 渲染的目标画布 -->
   <canvas id="canvas"></canvas>
   
+  <!-- 控制面板UI -->
   <div class="controls">
+      <!-- 控制面板标题 -->
       <h3>星系控制台</h3>
       
+      <!-- 粒子数量控制 -->
       <div class="control-item">
           <label>粒子数量: <span class="value" id="particleCountValue">2000</span></label>
           <input type="range" id="particleCount" min="500" max="3000" value="2000" step="100">
       </div>
       
+      <!-- 旋转速度控制 -->
       <div class="control-item">
           <label>旋转速度: <span class="value" id="rotationSpeedValue">0.5</span></label>
           <input type="range" id="rotationSpeed" min="0" max="2" value="0.5" step="0.1">
       </div>
       
+      <!-- 引力强度控制 -->
+      <!-- 引力强度控制 -->
       <div class="control-item">
           <label>引力强度: <span class="value" id="gravityValue">1.0</span></label>
           <input type="range" id="gravity" min="0" max="3" value="1" step="0.1">
       </div>
       
+      <!-- 粒子间连线概率控制 -->
       <div class="control-item">
           <label>连线概率: <span class="value" id="connectionProbabilityValue">15%</span></label>
           <input type="range" id="connectionProbability" min="5" max="50" value="15" step="5">
       </div>
       
+      <!-- 粒子间连线最大距离控制 -->
       <div class="control-item">
           <label>连线距离: <span class="value" id="connectionDistanceValue">12</span></label>
           <input type="range" id="connectionDistance" min="5" max="20" value="12" step="1">
       </div>
       
+      <!-- 是否显示连线的复选框 -->
       <div class="checkbox-item">
           <input type="checkbox" id="showConnections" checked>
           <label for="showConnections">显示连线</label>
       </div>
+      <!-- 超新星冷却状态显示 -->
       <div class="control-item">
           <label>超新星冷却: <span id="cooldown-status">就绪</span></label>
+          <!-- 冷却进度条 -->
           <div class="progress-bar-container">
               <div class="progress-bar" id="cooldown-progress"></div>
           </div>
       </div>
       
+      <!-- 重置按钮 -->
       <button id="resetBtn">重置星系</button>
+      <!-- 重新生成连线按钮 -->
       <button id="regenerateBtn">重新生成连线</button>
   </div>
   
+  <!-- 信息提示UI -->
   <div class="info">
+          <!-- 标题 -->
           <h4>欢迎来到手势控制的星系</h4>
+          <!-- 操作说明 -->
           <p>• 双手同时握拳再展开：触发超新星<br>
           • 左手握拳：吸引粒子<br>
+          <!-- 冷却状态显示 -->
           <p id="cooldown-status"></p>
+          <!-- 交互状态显示 -->
           <p id="interaction-status"></p>
              • 挥动双手：引导粒子运动<br>
              • 使用控制台调整参数<br>
              • 按空格键暂停/继续</p>
       </div>
   
+  <!-- 引入Three.js库 -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <!-- 引入MediaPipe摄像头工具库 -->
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+  <!-- 引入MediaPipe绘图工具库 -->
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+  <!-- 引入MediaPipe手势识别库 -->
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+  <!-- 主要的JavaScript逻辑 -->
   <script>
+      // 获取video元素
       const videoElement = document.getElementById('video');
 
       // 初始化 MediaPipe Hands
       const hands = new Hands({
+          // 指定资源文件加载路径
           locateFile: (file) => {
               return `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`;
           }
       });
 
+      // 设置Hands的配置选项
       hands.setOptions({
-          maxNumHands: 2,
-          modelComplexity: 1,
-          minDetectionConfidence: 0.5,
-          minTrackingConfidence: 0.5
+          maxNumHands: 2, // 最多检测2只手
+          modelComplexity: 1, // 模型复杂度
+          minDetectionConfidence: 0.5, // 最低检测置信度
+          minTrackingConfidence: 0.5 // 最低跟踪置信度
       });
 
+      // 设置手势识别结果的回调函数
       hands.onResults(onResults);
 
+      // 从window对象中获取预定义的HAND_CONNECTIONS，用于绘制手部骨架
       const { HAND_CONNECTIONS } = window;
 
       // 设置摄像头
       const mediaPipeCamera = new Camera(videoElement, {
+          // 每一帧的回调函数
           onFrame: async () => {
+              // 将视频帧发送给Hands进行处理
               await hands.send({ image: videoElement });
           },
-          width: 1280,
-          height: 720
+          width: 1280, // 视频宽度
+          height: 720 // 视频高度
       });
+      // 启动摄像头
       mediaPipeCamera.start();
 
-      // 检测手势是否握拳
+      // 检测手势是否握拳的辅助函数
       function isHandClosed(landmarks) {
-          // 使用食指和中指的弯曲程度判断手势
-          const fingerTipY = landmarks[8].y; // 食指指尖
-          const fingerBaseY = landmarks[5].y; // 食指根部
-          const middleTipY = landmarks[12].y; // 中指指尖
-          const middleBaseY = landmarks[9].y; // 中指根部
+          // 使用食指和中指的弯曲程度来判断手是否握拳
+          const fingerTipY = landmarks[8].y; // 食指指尖的Y坐标
+          const fingerBaseY = landmarks[5].y; // 食指根部的Y坐标
+          const middleTipY = landmarks[12].y; // 中指指尖的Y坐标
+          const middleBaseY = landmarks[9].y; // 中指根部的Y坐标
           
-          // 当指尖低于指根时，说明手指弯曲
+          // 当指尖的Y坐标大于指根的Y坐标时，认为手指是弯曲的（在MediaPipe的坐标系中）
           return fingerTipY > fingerBaseY && middleTipY > middleBaseY;
       }
 
-      // 存储手势状态
-      let leftHandClosed = false;
-      let rightHandClosed = false;
-      let leftHandPrevClosed = false;
-      let rightHandPrevClosed = false;
-      let supernovaActive = false;
-let supernovaCooldown = false;
-let lastSupernovaTime = 0;
-      let leftHandAttractor = null;
+      // 存储手势和应用状态的变量
+      let leftHandClosed = false; // 左手是否握拳
+      let rightHandClosed = false; // 右手是否握拳
+      let leftHandPrevClosed = false; // 上一帧左手是否握拳
+      let rightHandPrevClosed = false; // 上一-帧右手是否握拳
+      let supernovaActive = false; // 超新星效果是否激活
+      let supernovaCooldown = false; // 超新星是否在冷却中
+      let lastSupernovaTime = 0; // 上次触发超新星的时间
+      let leftHandAttractor = null; // 左手吸引子的三维向量
 
+      // MediaPipe Hands的结果回调函数
       function onResults(results) {
-          // 清除旧的手势网格
+          // 移除上一帧绘制的手部网格
           handMeshes.forEach(mesh => scene.remove(mesh));
           handMeshes = [];
 
+          // 当前帧的手势状态
           let currentLeftHandClosed = false;
           let currentRightHandClosed = false;
 
+          // 如果检测到手
           if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+              // 遍历检测到的每只手
               results.multiHandLandmarks.forEach((landmarks, i) => {
+                  // 获取是左手还是右手
                   const handedness = results.multiHandedness[i].label;
+                  // 判断手是否握拳
                   const isClosed = isHandClosed(landmarks);
 
+                  // 更新对应手的状态
                   if (handedness === 'Left') {
                       currentLeftHandClosed = isClosed;
                   } else if (handedness === 'Right') {
@@ -314,47 +385,53 @@ let lastSupernovaTime = 0;
               });
           }
 
-          // 检测双手同时从握拳到展开
+          // 检测双手是否同时从握拳状态变为展开状态，以触发超新星
           if (leftHandPrevClosed && rightHandPrevClosed && !currentLeftHandClosed && !currentRightHandClosed) {
               triggerSupernova();
           }
 
-          // 更新上一帧的手势状态
+          // 更新上一帧的手势状态，为下一帧的检测做准备
           leftHandPrevClosed = currentLeftHandClosed;
           rightHandPrevClosed = currentRightHandClosed;
 
-          // 左手握拳作为吸引子
+          // 如果左手握拳，则创建或更新吸引子
           if (currentLeftHandClosed) {
+              // 仅在超新星效果未激活时生效
               if (!supernovaActive) {
+                  // 找到左手的关键点数据
                   const leftLandmarks = results.multiHandLandmarks[results.multiHandedness.findIndex(h => h.label === 'Left')];
                   if (leftLandmarks) {
+                      // 计算手掌的中心点
                       const centerX = leftLandmarks.reduce((sum, lm) => sum + lm.x, 0) / leftLandmarks.length;
                       const centerY = leftLandmarks.reduce((sum, lm) => sum + lm.y, 0) / leftLandmarks.length;
                       const centerZ = leftLandmarks.reduce((sum, lm) => sum + lm.z, 0) / leftLandmarks.length;
+                      // 将中心点坐标转换为Three.js场景中的坐标，并创建吸引子向量
                       leftHandAttractor = new THREE.Vector3(
-                          (1 - centerX) * 100 - 50,
-                          centerY * -100 + 50,
-                          centerZ * 50
+                          (1 - centerX) * 100 - 50, // X坐标翻转和缩放
+                          centerY * -100 + 50, // Y坐标翻转和缩放
+                          centerZ * 50 // Z坐标缩放
                       );
                   }
               }
           } else {
+              // 如果左手没有握拳，则移除吸引子
               leftHandAttractor = null;
           }
 
+          // 如果检测到手，则在场景中绘制手的骨架
           if (results.multiHandLandmarks) {
               for (let i = 0; i < results.multiHandLandmarks.length; i++) {
                   const landmarks = results.multiHandLandmarks[i];
-                  const handGroup = new THREE.Group();
+                  const handGroup = new THREE.Group(); // 为每只手创建一个组
 
-                  // 创建材质
+                  // 创建用于绘制手部骨架的材质
                   const lineMaterial = new THREE.LineBasicMaterial({ color: 0x44ffbb });
                   const pointMaterial = new THREE.MeshBasicMaterial({ color: 0x44ffbb });
 
-                  // 转换关键点并创建点和线
+                  // 将MediaPipe的关键点坐标转换为Three.js的坐标
                   const points = landmarks.map(lm => new THREE.Vector3((1 - lm.x) * 100 - 50, lm.y * -100 + 50, lm.z * 50));
 
-                  // 创建点
+                  // 在每个关键点位置创建一个小球体来表示关节点
                   points.forEach(point => {
                       const geometry = new THREE.SphereGeometry(0.5, 16, 16);
                       const mesh = new THREE.Mesh(geometry, pointMaterial);
@@ -362,7 +439,7 @@ let lastSupernovaTime = 0;
                       handGroup.add(mesh);
                   });
 
-                  // 创建连接线
+                  // 根据HAND_CONNECTIONS创建连接线，形成手的骨架
                   HAND_CONNECTIONS.forEach(connection => {
                       const startPoint = points[connection[0]];
                       const endPoint = points[connection[1]];
@@ -371,23 +448,31 @@ let lastSupernovaTime = 0;
                       handGroup.add(line);
                   });
 
+                  // 将手部模型添加到场景中
                   scene.add(handGroup);
+                  // 将手部模型存入数组，方便后续移除
                   handMeshes.push(handGroup);
 
-                  // 用手势影响粒子
+                  // --- 手势对粒子的影响 ---
+                  // 遍历手的每个关键点
                   for (let i = 0; i < landmarks.length; i++) {
                       const landmark = landmarks[i];
+                      // 将关键点坐标转换为场景坐标
                       const handX = (1 - landmark.x) * 100 - 50;
                       const handY = landmark.y * -100 + 50;
                       const handZ = landmark.z * 50;
 
+                      // 获取粒子位置数组
                       const positions = particles.geometry.attributes.position.array;
+                      // 遍历所有粒子
                       for (let j = 0; j < particleCount; j++) {
+                          // 计算粒子与手部关键点的距离
                           const dx = positions[j * 3] - handX;
                           const dy = positions[j * 3 + 1] - handY;
                           const dz = positions[j * 3 + 2] - handZ;
                           const distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
 
+                          // 如果距离小于阈值，则施加一个力
                           if (distance < 5) {
                               const force = (5 - distance) * 0.01;
                               velocities[j].x += dx * force;
@@ -400,80 +485,85 @@ let lastSupernovaTime = 0;
           }
       }
 
-      // 场景设置
-      const scene = new THREE.Scene();
-      const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-      const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('canvas'), antialias: true, alpha: true });
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      renderer.setPixelRatio(window.devicePixelRatio);
+      // --- Three.js 场景设置 ---
+      const scene = new THREE.Scene(); // 创建场景
+      const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000); // 创建透视相机
+      const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('canvas'), antialias: true, alpha: true }); // 创建渲染器
+      renderer.setSize(window.innerWidth, window.innerHeight); // 设置渲染器尺寸
+      renderer.setPixelRatio(window.devicePixelRatio); // 设置设备像素比，以获得更清晰的图像
       
-      // 相机位置
+      // 设置相机初始位置
       camera.position.z = 50;
       
-      // 粒子系统变量
-      let particles, particleGeometry, particleMaterial;
-      let connections, connectionGeometry, connectionMaterial;
-      let particleCount = 2000;
-      let rotationSpeed = 0.5;
-      let gravityStrength = 1.0;
-      let connectionDistance = 12;
-      let connectionProbability = 15; // 连线概率百分比
-      let showConnections = true;
-      let isPaused = false;
+      // --- 粒子系统相关变量定义 ---
+      let particles, particleGeometry, particleMaterial; // 粒子系统的主要对象
+      let connections, connectionGeometry, connectionMaterial; // 粒子连线的主要对象
+      let particleCount = 2000; // 粒子数量
+      let rotationSpeed = 0.5; // 星系旋转速度
+      let gravityStrength = 1.0; // 中心引力强度
+      let connectionDistance = 12; // 粒子间连线的最大距离
+      let connectionProbability = 15; // 粒子间形成连线的概率（百分比）
+      let showConnections = true; // 是否显示连线
+      let isPaused = false; // 动画是否暂停
       
-
-      
-      // 粒子速度和大小数组
+      // 存储每个粒子的速度和大小
       let velocities = [];
       let particleSizes = [];
-      let connectionPairs = []; // 存储连线对
-      let handMeshes = []; // 存储手势网格
+      let connectionPairs = []; // 存储已连接的粒子对索引
+      let handMeshes = []; // 存储手部骨架的网格对象
       
-      // 创建粒子系统
+      // --- 创建粒子系统的函数 ---
       function createParticles() {
+          // 重置状态变量
           supernovaActive = false;
           leftHandAttractor = null;
+          // 如果已存在粒子系统，先从场景中移除并释放资源
           if (particles) {
               scene.remove(particles);
               particleGeometry.dispose();
               particleMaterial.dispose();
           }
           
+          // 如果已存在连线，也移除并释放资源
           if (connections) {
               scene.remove(connections);
               connectionGeometry.dispose();
               connectionMaterial.dispose();
           }
           
+          // 创建新的粒子几何体
           particleGeometry = new THREE.BufferGeometry();
+          // 初始化存储位置、颜色、大小的数组
           const positions = new Float32Array(particleCount * 3);
           const colors = new Float32Array(particleCount * 3);
           const sizes = new Float32Array(particleCount);
           velocities = [];
           particleSizes = [];
           
-          // 创建螺旋星系形状
+          // --- 生成螺旋星系形状的粒子 ---
           for (let i = 0; i < particleCount; i++) {
+              // 使用极坐标生成粒子位置，模拟星系旋臂
               const angle = Math.random() * Math.PI * 2;
               const radius = Math.random() * 30 + Math.random() * Math.random() * 20;
               const armAngle = angle + radius * 0.2;
               
+              // 设置粒子XYZ坐标
               positions[i * 3] = Math.cos(armAngle) * radius;
-              positions[i * 3 + 1] = (Math.random() - 0.5) * 5 * Math.exp(-radius / 20);
+              positions[i * 3 + 1] = (Math.random() - 0.5) * 5 * Math.exp(-radius / 20); // 在Y轴上添加一些随机偏移
               positions[i * 3 + 2] = Math.sin(armAngle) * radius;
               
-              // 随机粒子大小，大小范围从0.5到4
+              // 随机化每个粒子的大小
               const particleSize = 0.5 + Math.random() * 3.5;
               sizes[i] = particleSize;
               particleSizes.push(particleSize);
               
-              // 颜色变化
+              // 根据粒子距中心的距离设置颜色强度
               const colorIntensity = 1 - radius / 50;
               colors[i * 3] = 0.27 * colorIntensity;
               colors[i * 3 + 1] = 1.0 * colorIntensity;
               colors[i * 3 + 2] = 0.73 * colorIntensity;
               
-              // 初始速度
+              // 为每个粒子设置一个随机的初始速度
               velocities.push(new THREE.Vector3(
                   (Math.random() - 0.5) * 0.02,
                   (Math.random() - 0.5) * 0.02,
@@ -481,46 +571,50 @@ let lastSupernovaTime = 0;
               ));
           }
           
+          // 将位置、颜色和大小数据设置为几何体的属性
           particleGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
           particleGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
           particleGeometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
           
-          // 使用自定义着色器材质来支持不同大小的粒子
+          // --- 自定义着色器材质 ---
+          // 顶点着色器：计算每个点的大小和位置
           const vertexShader = `
-              attribute float size;
-              varying vec3 vColor;
+              attribute float size; // 从BufferGeometry接收size属性
+              varying vec3 vColor; // 将颜色传递给片元着色器
               
               void main() {
-                  vColor = color;
-                  vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
-                  gl_PointSize = size * (300.0 / -mvPosition.z);
-                  gl_Position = projectionMatrix * mvPosition;
+                  vColor = color; // 传递颜色
+                  vec4 mvPosition = modelViewMatrix * vec4(position, 1.0); // 计算模型视图位置
+                  gl_PointSize = size * (300.0 / -mvPosition.z); // 根据距离调整点的大小，实现透视效果
+                  gl_Position = projectionMatrix * mvPosition; // 计算最终裁剪空间位置
               }
           `;
           
+          // 片元着色器：为每个点绘制一个圆形的、带透明度的形状
           const fragmentShader = `
-              varying vec3 vColor;
+              varying vec3 vColor; // 从顶点着色器接收颜色
               
               void main() {
                   float r = 0.0, delta = 0.0, alpha = 1.0;
-                  vec2 cxy = 2.0 * gl_PointCoord - 1.0;
-                  r = dot(cxy, cxy);
-                  if (r > 1.0) {
+                  vec2 cxy = 2.0 * gl_PointCoord - 1.0; // 将点坐标转换为-1到1的范围
+                  r = dot(cxy, cxy); // 计算到中心点的距离的平方
+                  if (r > 1.0) { // 如果在圆形之外，则丢弃该片元
                       discard;
                   }
-                  alpha = 1.0 - smoothstep(0.1, 1.0, r);
-                  gl_FragColor = vec4(vColor, alpha);
+                  alpha = 1.0 - smoothstep(0.1, 1.0, r); // 创建平滑的圆形边缘
+                  gl_FragColor = vec4(vColor, alpha); // 设置最终颜色和透明度
               }
           `;
           
+          // 创建着色器材质
           particleMaterial = new THREE.ShaderMaterial({
-              uniforms: {},
-              vertexShader: vertexShader,
-              fragmentShader: fragmentShader,
-              blending: THREE.AdditiveBlending,
-              depthTest: false,
-              transparent: true,
-              vertexColors: true
+              uniforms: {}, // 本例中没有uniforms
+              vertexShader: vertexShader, // 指定顶点着色器
+              fragmentShader: fragmentShader, // 指定片元着色器
+              blending: THREE.AdditiveBlending, // 使用加法混合，产生发光效果
+              depthTest: false, // 关闭深度测试，避免粒子相互遮挡问题
+              transparent: true, // 开启透明度
+              vertexColors: true // 使用顶点颜色
           });
           
           particles = new THREE.Points(particleGeometry, particleMaterial);
@@ -542,59 +636,66 @@ let lastSupernovaTime = 0;
               const z1 = positions[i * 3 + 2];
               
               // 大节点有更多连线机会
-              const nodeSize = particleSizes[i];
-              const connectionChance = (connectionProbability / 100) * (nodeSize / 2); // 基于节点大小调整连线概率
+              const nodeSize = particleSizes[i]; // 获取当前节点（粒子）的大小
+              const connectionChance = (connectionProbability / 100) * (nodeSize / 2); // 根据节点大小和设定的概率计算实际的连线几率
               
+              // 遍历当前粒子之后的所有粒子，避免重复计算和自己连接自己
               for (let j = i + 1; j < particleCount; j++) {
                   const x2 = positions[j * 3];
                   const y2 = positions[j * 3 + 1];
                   const z2 = positions[j * 3 + 2];
                   
-                  // 计算距离
+                  // 计算两个粒子之间的三维空间距离
                   const dx = x2 - x1;
                   const dy = y2 - y1;
                   const dz = z2 - z1;
                   const distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
                   
-                  // 距离在范围内且随机概率满足条件
+                  // 如果距离在设定的阈值内，并且随机数小于连线几率，则创建连接
                   if (distance < connectionDistance && Math.random() < connectionChance) {
-                      connectionPairs.push([i, j]);
+                      connectionPairs.push([i, j]); // 将这对粒子的索引存入数组
                   }
               }
           }
       }
       
-      // 创建连线系统
+      // --- 创建粒子连线系统的函数 ---
       function createConnections() {
+          // 如果已存在连线对象，先从场景中移除并释放资源
           if (connections) {
               scene.remove(connections);
               connectionGeometry.dispose();
               connectionMaterial.dispose();
           }
           
+          // 如果没有需要连接的粒子对，则直接返回
           if (connectionPairs.length === 0) return;
           
+          // 创建新的连线几何体
           connectionGeometry = new THREE.BufferGeometry();
           
-          const connectionPositions = new Float32Array(connectionPairs.length * 6);
+          // 初始化存储连线端点位置和颜色的数组
+          const connectionPositions = new Float32Array(connectionPairs.length * 6); // 每条线2个点，每个点3个坐标
           const connectionColors = new Float32Array(connectionPairs.length * 6);
           
-          // 设置连线颜色为50%透明度的#44ffbb
+          // 定义连线的颜色
           const lineColor = new THREE.Color(0x44ffbb);
           
+          // 遍历所有连接对，设置它们的位置和颜色
           for (let i = 0; i < connectionPairs.length; i++) {
-              const [idx1, idx2] = connectionPairs[i];
-              const positions = particles.geometry.attributes.position.array;
+              const [idx1, idx2] = connectionPairs[i]; // 获取一对粒子的索引
+              const positions = particles.geometry.attributes.position.array; // 获取所有粒子的位置数组
               
-              // 设置连线的两个端点
+              // 设置连线的起点坐标
               connectionPositions[i * 6] = positions[idx1 * 3];
               connectionPositions[i * 6 + 1] = positions[idx1 * 3 + 1];
               connectionPositions[i * 6 + 2] = positions[idx1 * 3 + 2];
+              // 设置连线的终点坐标
               connectionPositions[i * 6 + 3] = positions[idx2 * 3];
               connectionPositions[i * 6 + 4] = positions[idx2 * 3 + 1];
               connectionPositions[i * 6 + 5] = positions[idx2 * 3 + 2];
               
-              // 设置连线颜色
+              // 为连线的两个端点设置颜色
               connectionColors[i * 6] = lineColor.r;
               connectionColors[i * 6 + 1] = lineColor.g;
               connectionColors[i * 6 + 2] = lineColor.b;
@@ -603,32 +704,37 @@ let lastSupernovaTime = 0;
               connectionColors[i * 6 + 5] = lineColor.b;
           }
           
+          // 将位置和颜色数据设置为几何体的属性
           connectionGeometry.setAttribute('position', new THREE.BufferAttribute(connectionPositions, 3));
           connectionGeometry.setAttribute('color', new THREE.BufferAttribute(connectionColors, 3));
           
+          // 创建连线材质
           connectionMaterial = new THREE.LineBasicMaterial({
-              vertexColors: true,
-              transparent: true,
-              opacity: 0.5, // 50%透明度
-              blending: THREE.AdditiveBlending
+              vertexColors: true, // 使用顶点颜色
+              transparent: true, // 开启透明度
+              opacity: 0.5, // 设置50%的透明度
+              blending: THREE.AdditiveBlending // 使用加法混合，产生发光效果
           });
           
+          // 创建表示所有连线的LineSegments对象
           connections = new THREE.LineSegments(connectionGeometry, connectionMaterial);
-          connections.visible = showConnections;
-          scene.add(connections);
+          connections.visible = showConnections; // 根据全局设置决定是否可见
+          scene.add(connections); // 将连线添加到场景中
       }
       
-      // 更新连线位置
+      // --- 更新连线位置的函数 ---
       function updateConnections() {
+          // 如果不显示连线、连线对象不存在或没有连线对，则不执行更新
           if (!showConnections || !connections || connectionPairs.length === 0) return;
           
-          const positions = particles.geometry.attributes.position.array;
-          const connectionPositions = connections.geometry.attributes.position.array;
+          const positions = particles.geometry.attributes.position.array; // 获取粒子位置
+          const connectionPositions = connections.geometry.attributes.position.array; // 获取连线端点位置
           
+          // 遍历所有连线对
           for (let i = 0; i < connectionPairs.length; i++) {
               const [idx1, idx2] = connectionPairs[i];
               
-              // 更新连线的两个端点位置
+              // 根据粒子的新位置更新连线端点的位置
               connectionPositions[i * 6] = positions[idx1 * 3];
               connectionPositions[i * 6 + 1] = positions[idx1 * 3 + 1];
               connectionPositions[i * 6 + 2] = positions[idx1 * 3 + 2];
@@ -637,125 +743,139 @@ let lastSupernovaTime = 0;
               connectionPositions[i * 6 + 5] = positions[idx2 * 3 + 2];
           }
           
+          // 标记位置属性需要更新，这样Three.js才会在下一帧重新渲染连线
           connections.geometry.attributes.position.needsUpdate = true;
       }
       
-      // 超新星爆炸效果
+      // --- 触发超新星爆炸效果的函数 ---
       function triggerSupernova() {
+          // 如果正在冷却中，则不触发
           if (supernovaCooldown) return;
 
+          // 激活超新星状态和冷却状态
           supernovaActive = true;
           supernovaCooldown = true;
-          lastSupernovaTime = Date.now();
+          lastSupernovaTime = Date.now(); // 记录触发时间
 
           const positions = particles.geometry.attributes.position.array;
           
+          // 为每个粒子施加一个随机方向和大小的爆发力
           for (let i = 0; i < particleCount; i++) {
-              const force = 5 + Math.random() * 10;
-              const angle = Math.random() * Math.PI * 2;
-              const theta = Math.random() * Math.PI;
+              const force = 5 + Math.random() * 10; // 随机力大小
+              const angle = Math.random() * Math.PI * 2; // 随机方位角
+              const theta = Math.random() * Math.PI; // 随机天顶角
               
+              // 将球面坐标转换为笛卡尔坐标，并施加到速度上
               velocities[i].x += Math.sin(theta) * Math.cos(angle) * force;
               velocities[i].y += Math.cos(theta) * force;
               velocities[i].z += Math.sin(theta) * Math.sin(angle) * force;
           }
 
+          // 2秒后结束超新星的激活状态（爆炸效果减弱）
           setTimeout(() => {
               supernovaActive = false;
-          }, 2000); // 爆炸效果持续2秒
+          }, 2000);
 
+          // 30秒后结束冷却状态，允许再次触发
           setTimeout(() => {
               supernovaCooldown = false;
-          }, 30000); // 30秒冷却
+          }, 30000);
       }
       
-      // 更新粒子
+      // --- 更新粒子状态的函数（每帧调用） ---
       function updateParticles() {
+          // 如果动画暂停，则不更新
           if (isPaused) return;
           
-          const positions = particles.geometry.attributes.position.array;
-          const colors = particles.geometry.attributes.color.array;
+          const positions = particles.geometry.attributes.position.array; // 获取粒子位置数组
+          const colors = particles.geometry.attributes.color.array; // 获取粒子颜色数组
           
-          // 旋转整个星系
+          // 根据旋转速度旋转整个粒子系统（包括连线）
           particles.rotation.y += rotationSpeed * 0.001;
           if (connections) {
               connections.rotation.y += rotationSpeed * 0.001;
           }
           
+          // 遍历所有粒子
           for (let i = 0; i < particleCount; i++) {
-              const idx = i * 3;
+              const idx = i * 3; // 计算当前粒子在位置数组中的起始索引
               
-              // 当前位置
+              // 获取当前粒子的XYZ坐标
               const x = positions[idx];
               const y = positions[idx + 1];
               const z = positions[idx + 2];
               
-
-              
-              // 如果左手吸引子存在，则粒子向吸引子运动
+              // --- 计算作用在粒子上的力 ---
+              // 如果左手握拳形成吸引子
               if (leftHandAttractor) {
+                  // 计算从粒子指向吸引子的向量，并归一化，然后乘以一个标量作为吸引力
                   const attractorForce = new THREE.Vector3().subVectors(leftHandAttractor, new THREE.Vector3(x, y, z)).normalize().multiplyScalar(0.15);
-                  velocities[i].add(attractorForce);
+                  velocities[i].add(attractorForce); // 将吸引力加到速度上
               } else {
-                  // 中心引力
+                  // 如果没有吸引子，则施加中心引力
                   const centerDistance = Math.sqrt(x * x + y * y + z * z);
-                  if (centerDistance > 0.1) {
-                      const centerForce = 0.01 / centerDistance;
-                      velocities[i].x -= x * centerForce;
-                      velocities[i].y -= y * centerForce * 0.1;
+                  if (centerDistance > 0.1) { // 避免在中心点产生无限大的力
+                      const centerForce = 0.01 / centerDistance; // 引力大小与距离成反比
+                      velocities[i].x -= x * centerForce; // 将引力分解到XYZ轴
+                      velocities[i].y -= y * centerForce * 0.1; // Y轴引力较弱，使星系呈扁平状
                       velocities[i].z -= z * centerForce;
                   }
               }
               
-              // 阻尼
+              // 施加阻尼，使粒子运动逐渐减速
               velocities[i].multiplyScalar(0.98);
               
-              // 更新位置
+              // 根据速度更新粒子的位置
               positions[idx] += velocities[i].x;
               positions[idx + 1] += velocities[i].y;
               positions[idx + 2] += velocities[i].z;
               
-              // 更新颜色（基于速度）
+              // 根据粒子的速度更新颜色，速度越快越亮
               const speed = velocities[i].length();
-              const colorIntensity = Math.min(1, 0.5 + speed * 10);
+              const colorIntensity = Math.min(1, 0.5 + speed * 10); // 将颜色强度限制在1以内
               colors[idx] = 0.27 * colorIntensity;
               colors[idx + 1] = 1.0 * colorIntensity;
               colors[idx + 2] = 0.73 * colorIntensity;
           }
           
+          // 标记位置和颜色属性需要更新
           particles.geometry.attributes.position.needsUpdate = true;
           particles.geometry.attributes.color.needsUpdate = true;
           
-          // 更新连线
+          // 更新连线的位置
           updateConnections();
       }
       
-
-      
+      // --- 事件监听 ---
+      // 监听键盘事件，按下空格键暂停/继续动画
       document.addEventListener('keydown', (e) => {
           if (e.code === 'Space') {
               isPaused = !isPaused;
-              e.preventDefault();
+              e.preventDefault(); // 阻止默认行为（如页面滚动）
           }
       });
       
-      // 控制面板
+      // --- 控制面板UI事件监听 ---
+      // 监听粒子数量滑块的变化
       document.getElementById('particleCount').addEventListener('input', (e) => {
-          particleCount = parseInt(e.target.value);
-          document.getElementById('particleCountValue').textContent = particleCount;
-          createParticles();
+          particleCount = parseInt(e.target.value); // 更新粒子数量变量
+          document.getElementById('particleCountValue').textContent = particleCount; // 更新UI显示的值
+          createParticles(); // 重新创建粒子系统
       });
       
+      // 监听旋转速度滑块的变化
       document.getElementById('rotationSpeed').addEventListener('input', (e) => {
-          rotationSpeed = parseFloat(e.target.value);
-          document.getElementById('rotationSpeedValue').textContent = rotationSpeed;
+          rotationSpeed = parseFloat(e.target.value); // 更新旋转速度变量
+          document.getElementById('rotationSpeedValue').textContent = rotationSpeed; // 更新UI显示的值
       });
       
+      // 监听引力强度滑块的变化
       document.getElementById('gravity').addEventListener('input', (e) => {
-          gravityStrength = parseFloat(e.target.value);
-          document.getElementById('gravityValue').textContent = gravityStrength.toFixed(1);
+          gravityStrength = parseFloat(e.target.value); // 更新引力强度变量
+          document.getElementById('gravityValue').textContent = gravityStrength.toFixed(1); // 更新UI显示的值
       });
       
+      // 监听连线距离滑块的变化
       document.getElementById('connectionDistance').addEventListener('input', (e) => {
           connectionDistance = parseFloat(e.target.value);
           document.getElementById('connectionDistanceValue').textContent = connectionDistance;
