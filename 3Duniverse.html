@@ -22,7 +22,7 @@
       /* 页面主体样式 */
       body {
           background-color: transparent; /* 背景色设置为透明 */
-          color: #44ffbb; /* 文本颜色 */
+          color: var(--theme-color); /* 文本颜色 */
           font-family: 'Arial', sans-serif; /* 字体 */
           overflow: hidden; /* 隐藏溢出内容 */
           cursor: crosshair; /* 鼠标指针样式 */
@@ -44,7 +44,7 @@
           top: 20px;
           right: 20px;
           background: rgba(0, 0, 0, 0.8); /* 半透明背景 */
-          border: 1px solid #44ffbb; /* 边框 */
+          border: 1px solid var(--theme-color); /* 边框 */
           border-radius: 10px; /* 圆角 */
           padding: 20px; /* 内边距 */
           backdrop-filter: blur(10px); /* 背景模糊效果 */
@@ -56,7 +56,7 @@
       .controls h3 {
           margin-bottom: 15px;
           text-align: center;
-          text-shadow: 0 0 10px #44ffbb; /* 文本发光效果 */
+          text-shadow: 0 0 10px var(--theme-color); /* 文本发光效果 */
       }
       
       /* 控制项容器样式 */
@@ -86,25 +86,25 @@
           -webkit-appearance: none; /* 移除默认样式 */
           width: 15px;
           height: 15px;
-          background: #44ffbb;
+          background: var(--theme-color);
           border-radius: 50%;
           cursor: pointer;
-          box-shadow: 0 0 10px #44ffbb; /* 按钮发光效果 */
+          box-shadow: 0 0 10px var(--theme-color); /* 按钮发光效果 */
       }
       
       /* Firefox浏览器滑块按钮样式 */
       .control-item input[type="range"]::-moz-range-thumb {
           width: 15px;
           height: 15px;
-          background: #44ffbb;
+          background: var(--theme-color);
           border-radius: 50%;
           cursor: pointer;
-          box-shadow: 0 0 10px #44ffbb; /* 按钮发光效果 */
+          box-shadow: 0 0 10px var(--theme-color); /* 按钮发光效果 */
       }
       
       /* 显示滑块值的span元素样式 */
       .value {
-          color: #88ffdd;
+          color: var(--theme-color-light);
           font-size: 12px;
       }
       
@@ -114,7 +114,7 @@
           bottom: 20px;
           left: 20px;
           background: rgba(0, 0, 0, 0.8);
-          border: 1px solid #44ffbb;
+          border: 1px solid var(--theme-color);
           border-radius: 10px;
           padding: 15px;
           backdrop-filter: blur(10px);
@@ -124,7 +124,7 @@
       /* 信息框标题样式 */
       .info h4 {
           margin-bottom: 10px;
-          text-shadow: 0 0 10px #44ffbb;
+          text-shadow: 0 0 10px var(--theme-color);
       }
       
       /* 信息框段落样式 */
@@ -137,8 +137,8 @@
       /* 按钮通用样式 */
       button {
           background: transparent;
-          border: 1px solid #44ffbb;
-          color: #44ffbb;
+          border: 1px solid var(--theme-color);
+          color: var(--theme-color);
           padding: 8px 16px;
           border-radius: 5px;
           cursor: pointer;
@@ -149,9 +149,9 @@
       
       /* 按钮悬停效果 */
       button:hover {
-          background: #44ffbb;
+          background: var(--theme-color);
           color: #000;
-          box-shadow: 0 0 20px #44ffbb;
+          box-shadow: 0 0 20px var(--theme-color);
       }
 
       /* 进度条容器样式 */
@@ -167,7 +167,7 @@
       .progress-bar {
           width: 100%; /* 初始宽度 */
           height: 100%;
-          background: #44ffbb;
+          background: var(--theme-color);
           border-radius: 5px;
           transition: width 0.1s linear; /* 宽度变化时的平滑过渡 */
       }
@@ -202,6 +202,42 @@
           height: 100%;
           object-fit: cover; /* 覆盖整个容器 */
           transform: scaleX(-1); /* 水平翻转，实现镜像效果 */
+      }
+
+      /* 颜色选择器容器样式 */
+      .color-picker {
+          position: fixed;
+          bottom: 20px;
+          left: 50%;
+          transform: translateX(-50%);
+          background: rgba(0, 0, 0, 0.8);
+          border: 1px solid var(--theme-color);
+          border-radius: 10px;
+          padding: 10px;
+          display: flex;
+          gap: 10px;
+          z-index: 1000;
+      }
+
+      /* 单个颜色块样式 */
+      .color-box {
+          width: 30px;
+          height: 30px;
+          border-radius: 50%;
+          cursor: pointer;
+          border: 2px solid transparent;
+          transition: all 0.3s;
+      }
+
+      /* 颜色块悬停效果 */
+      .color-box:hover {
+          transform: scale(1.1);
+      }
+
+      /* 选中颜色块的样式 */
+      .color-box.selected {
+          border-color: #fff;
+          box-shadow: 0 0 10px #fff;
       }
   </style>
 </head>
@@ -269,6 +305,17 @@
       <button id="resetBtn">重置星系</button>
       <!-- 重新生成连线按钮 -->
       <button id="regenerateBtn">重新生成连线</button>
+  </div>
+
+  <!-- 颜色选择器 -->
+  <div class="color-picker" id="colorPicker">
+      <!-- 预设颜色 -->
+      <div class="color-box" style="background-color: #4499FF;" data-color="#4499FF"></div>
+      <div class="color-box" style="background-color: #44FF44;" data-color="#44FF44"></div>
+      <div class="color-box" style="background-color: #44FFBB;" data-color="#44FFBB"></div>
+      <div class="color-box" style="background-color: #5544FF;" data-color="#5544FF"></div>
+      <div class="color-box" style="background-color: #FF4455;" data-color="#FF4455"></div>
+      <div class="color-box" style="background-color: #FFCC44;" data-color="#FFCC44"></div>
   </div>
   
   <!-- 信息提示UI -->
@@ -425,8 +472,8 @@
                   const handGroup = new THREE.Group(); // 为每只手创建一个组
 
                   // 创建用于绘制手部骨架的材质
-                  const lineMaterial = new THREE.LineBasicMaterial({ color: 0x44ffbb });
-                  const pointMaterial = new THREE.MeshBasicMaterial({ color: 0x44ffbb });
+                  const lineMaterial = new THREE.LineBasicMaterial({ color: currentThemeColor });
+                  const pointMaterial = new THREE.MeshBasicMaterial({ color: currentThemeColor });
 
                   // 将MediaPipe的关键点坐标转换为Three.js的坐标
                   const points = landmarks.map(lm => new THREE.Vector3((1 - lm.x) * 100 - 50, lm.y * -100 + 50, lm.z * 50));
@@ -511,7 +558,54 @@
       let particleSizes = [];
       let connectionPairs = []; // 存储已连接的粒子对索引
       let handMeshes = []; // 存储手部骨架的网格对象
-      
+      let currentThemeColor = new THREE.Color('#44ffbb'); // 当前主题颜色
+
+      // --- 更改主题颜色函数 ---
+      function changeThemeColor(hexColor) {
+          currentThemeColor.set(hexColor);
+          const color = new THREE.Color(hexColor);
+          const lighterColor = color.clone().multiplyScalar(1.5).getStyle();
+
+          // 更新CSS变量
+          document.documentElement.style.setProperty('--theme-color', hexColor);
+          document.documentElement.style.setProperty('--theme-color-light', lighterColor);
+
+
+          // 更新粒子颜色
+          if (particles) {
+              const colors = particles.geometry.attributes.color.array;
+              const positions = particles.geometry.attributes.position.array;
+              for (let i = 0; i < particleCount; i++) {
+                  const radius = Math.sqrt(positions[i * 3] ** 2 + positions[i * 3 + 2] ** 2);
+                  const colorIntensity = 1 - radius / 50;
+                  colors[i * 3] = currentThemeColor.r * colorIntensity;
+                  colors[i * 3 + 1] = currentThemeColor.g * colorIntensity;
+                  colors[i * 3 + 2] = currentThemeColor.b * colorIntensity;
+              }
+              particles.geometry.attributes.color.needsUpdate = true;
+          }
+
+          // 更新连线颜色
+          if (connections) {
+              connectionMaterial.color.set(currentThemeColor);
+              connectionMaterial.needsUpdate = true;
+          }
+
+          // 更新手部骨架颜色
+          handMeshes.forEach(handGroup => {
+              handGroup.children.forEach(child => {
+                  if (child.material) {
+                      child.material.color.set(currentThemeColor);
+                  }
+              });
+          });
+      }
+
+      // 页面加载时设置初始颜色
+      document.addEventListener('DOMContentLoaded', () => {
+          changeThemeColor('#44ffbb');
+      });
+
       // --- 创建粒子系统的函数 ---
       function createParticles() {
           // 重置状态变量
@@ -559,9 +653,9 @@
               
               // 根据粒子距中心的距离设置颜色强度
               const colorIntensity = 1 - radius / 50;
-              colors[i * 3] = 0.27 * colorIntensity;
-              colors[i * 3 + 1] = 1.0 * colorIntensity;
-              colors[i * 3 + 2] = 0.73 * colorIntensity;
+          colors[i * 3] = currentThemeColor.r * colorIntensity;
+          colors[i * 3 + 1] = currentThemeColor.g * colorIntensity;
+          colors[i * 3 + 2] = currentThemeColor.b * colorIntensity;
               
               // 为每个粒子设置一个随机的初始速度
               velocities.push(new THREE.Vector3(
@@ -679,7 +773,7 @@
           const connectionColors = new Float32Array(connectionPairs.length * 6);
           
           // 定义连线的颜色
-          const lineColor = new THREE.Color(0x44ffbb);
+          const lineColor = currentThemeColor;
           
           // 遍历所有连接对，设置它们的位置和颜色
           for (let i = 0; i < connectionPairs.length; i++) {
@@ -833,9 +927,9 @@
               // 根据粒子的速度更新颜色，速度越快越亮
               const speed = velocities[i].length();
               const colorIntensity = Math.min(1, 0.5 + speed * 10); // 将颜色强度限制在1以内
-              colors[idx] = 0.27 * colorIntensity;
-              colors[idx + 1] = 1.0 * colorIntensity;
-              colors[idx + 2] = 0.73 * colorIntensity;
+              colors[idx] = currentThemeColor.r * colorIntensity;
+              colors[idx + 1] = currentThemeColor.g * colorIntensity;
+              colors[idx + 2] = currentThemeColor.b * colorIntensity;
           }
           
           // 标记位置和颜色属性需要更新
@@ -884,6 +978,18 @@
       document.getElementById('connectionProbability').addEventListener('input', (e) => {
           connectionProbability = parseFloat(e.target.value);
           document.getElementById('connectionProbabilityValue').textContent = connectionProbability + '%';
+      });
+
+      // 监听颜色选择器
+      document.getElementById('colorPicker').addEventListener('click', (e) => {
+          if (e.target.classList.contains('color-box')) {
+              const newColor = e.target.dataset.color;
+              changeThemeColor(newColor);
+
+              // 更新选中样式
+              document.querySelectorAll('.color-box').forEach(box => box.classList.remove('selected'));
+              e.target.classList.add('selected');
+          }
       });
       
       document.getElementById('showConnections').addEventListener('change', (e) => {
