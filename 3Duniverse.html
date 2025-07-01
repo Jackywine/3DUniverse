@@ -227,7 +227,8 @@
   
   <div class="info">
           <h4>欢迎来到手势控制的星系</h4>
-          <p>• 左手握拳再展开：触发超新星 (爆炸后再次握拳可吸引粒子)<br>
+          <p>• 双手同时握拳再展开：触发超新星<br>
+          • 左手握拳：吸引粒子<br>
           <p id="cooldown-status"></p>
           <p id="interaction-status"></p>
              • 挥动双手：引导粒子运动<br>
@@ -297,43 +298,53 @@ let lastSupernovaTime = 0;
           handMeshes.forEach(mesh => scene.remove(mesh));
           handMeshes = [];
 
-          if (results.multiHandLandmarks) {
-              for (let i = 0; i < results.multiHandLandmarks.length; i++) {
-                  const landmarks = results.multiHandLandmarks[i];
+          let currentLeftHandClosed = false;
+          let currentRightHandClosed = false;
+
+          if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+              results.multiHandLandmarks.forEach((landmarks, i) => {
                   const handedness = results.multiHandedness[i].label;
                   const isClosed = isHandClosed(landmarks);
 
-                  // 更新手势状态
                   if (handedness === 'Left') {
-                      leftHandPrevClosed = leftHandClosed;
-                      leftHandClosed = isClosed;
-
-                      // 检测左手握拳到展开的动作，触发超新星
-                      if (leftHandPrevClosed && !leftHandClosed) {
-                          triggerSupernova();
-                      }
-
-                      // 左手握拳时，则作为吸引子
-                      if (leftHandClosed) {
-                          // 在超新星爆炸期间，延迟创建吸引子，避免冲突
-                          if (!supernovaActive) {
-                              const centerX = landmarks.reduce((sum, lm) => sum + lm.x, 0) / landmarks.length;
-                              const centerY = landmarks.reduce((sum, lm) => sum + lm.y, 0) / landmarks.length;
-                              const centerZ = landmarks.reduce((sum, lm) => sum + lm.z, 0) / landmarks.length;
-                              leftHandAttractor = new THREE.Vector3(
-                                  (1 - centerX) * 100 - 50,
-                                  centerY * -100 + 50,
-                                  centerZ * 50
-                              );
-                          }
-                      } else {
-                          // 手展开时移除吸引
-                          leftHandAttractor = null;
-                      }
-                  } else {
-                      rightHandPrevClosed = rightHandClosed;
-                      rightHandClosed = isClosed;
+                      currentLeftHandClosed = isClosed;
+                  } else if (handedness === 'Right') {
+                      currentRightHandClosed = isClosed;
                   }
+              });
+          }
+
+          // 检测双手同时从握拳到展开
+          if (leftHandPrevClosed && rightHandPrevClosed && !currentLeftHandClosed && !currentRightHandClosed) {
+              triggerSupernova();
+          }
+
+          // 更新上一帧的手势状态
+          leftHandPrevClosed = currentLeftHandClosed;
+          rightHandPrevClosed = currentRightHandClosed;
+
+          // 左手握拳作为吸引子
+          if (currentLeftHandClosed) {
+              if (!supernovaActive) {
+                  const leftLandmarks = results.multiHandLandmarks[results.multiHandedness.findIndex(h => h.label === 'Left')];
+                  if (leftLandmarks) {
+                      const centerX = leftLandmarks.reduce((sum, lm) => sum + lm.x, 0) / leftLandmarks.length;
+                      const centerY = leftLandmarks.reduce((sum, lm) => sum + lm.y, 0) / leftLandmarks.length;
+                      const centerZ = leftLandmarks.reduce((sum, lm) => sum + lm.z, 0) / leftLandmarks.length;
+                      leftHandAttractor = new THREE.Vector3(
+                          (1 - centerX) * 100 - 50,
+                          centerY * -100 + 50,
+                          centerZ * 50
+                      );
+                  }
+              }
+          } else {
+              leftHandAttractor = null;
+          }
+
+          if (results.multiHandLandmarks) {
+              for (let i = 0; i < results.multiHandLandmarks.length; i++) {
+                  const landmarks = results.multiHandLandmarks[i];
                   const handGroup = new THREE.Group();
 
                   // 创建材质
