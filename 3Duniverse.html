@@ -21,7 +21,7 @@
       
       /* 页面主体样式 */
       body {
-          background-color: transparent; /* 背景色设置为透明 */
+          background-color: #000000; /* 背景色设置为黑色 */
           color: var(--theme-color); /* 文本颜色 */
           font-family: 'Arial', sans-serif; /* 字体 */
           overflow: hidden; /* 隐藏溢出内容 */
@@ -291,6 +291,12 @@
       <div class="checkbox-item">
           <input type="checkbox" id="showConnections" checked>
           <label for="showConnections">显示连线</label>
+      </div>
+      
+      <!-- 是否显示摄像头背景的复选框 -->
+      <div class="checkbox-item">
+          <input type="checkbox" id="showVideo" checked>
+          <label for="showVideo">显示摄像头背景</label>
       </div>
       <!-- 超新星冷却状态显示 -->
       <div class="control-item">
@@ -1041,6 +1047,11 @@
 
           renderer.render(scene, camera);
       }
+      
+      // 控制摄像头背景显示的复选框
+      document.getElementById('showVideo').addEventListener('change', (e) => {
+          document.getElementById('video-container').style.display = e.target.checked ? 'block' : 'none';
+      });
       
       // 初始化
       createParticles();
